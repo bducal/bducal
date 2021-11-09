@@ -1,0 +1,9 @@
+{
+	"name": "ducaldf2",
+	"location": "northeurope",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "44907b40-d382-4683-9c87-a467d928f0ac",
+		"tenantId": "5a7361b4-fa6a-4f99-893c-df75492686e2"
+	}
+}

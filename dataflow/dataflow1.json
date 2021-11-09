@@ -1,0 +1,49 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Excel1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				},
+				{
+					"dataset": {
+						"referenceName": "Excel1",
+						"type": "DatasetReference"
+					},
+					"name": "source2"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Json3",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				},
+				{
+					"dataset": {
+						"referenceName": "Json3",
+						"type": "DatasetReference"
+					},
+					"name": "sink2"
+				}
+			],
+			"transformations": [
+				{
+					"name": "Filter1"
+				},
+				{
+					"name": "Aggregate1"
+				}
+			],
+			"script": "source(output(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as string,\n\t\tColumn_9 as string,\n\t\tColumn_10 as string,\n\t\tColumn_11 as string,\n\t\tColumn_12 as string,\n\t\tColumn_13 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source1\nsource(output(\n\t\tColumn_1 as string,\n\t\tColumn_2 as string,\n\t\tColumn_3 as string,\n\t\tColumn_4 as string,\n\t\tColumn_5 as string,\n\t\tColumn_6 as string,\n\t\tColumn_7 as string,\n\t\tColumn_8 as string,\n\t\tColumn_9 as string,\n\t\tColumn_10 as string,\n\t\tColumn_11 as string,\n\t\tColumn_12 as string,\n\t\tColumn_13 as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> source2\nsource1 filter(Column_1==\"dariusz.jordan@amatex.com.pl\") ~> Filter1\nsource2 aggregate(Column_1 = countDistinct(Column_1)) ~> Aggregate1\nFilter1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['json4.txt'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> sink1\nAggregate1 sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['aggr1.json'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tpartitionBy('hash', 1)) ~> sink2"
+		}
+	}
+}

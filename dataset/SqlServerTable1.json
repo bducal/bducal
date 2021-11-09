@@ -1,0 +1,42 @@
+{
+	"name": "SqlServerTable1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "SqlServer1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "AnkietaPytanieID",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "AnkietaPytanieAnkietaOpis",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "AnkietaPytanieTresc",
+				"type": "varchar"
+			},
+			{
+				"name": "AnkietaPytanieRodzajOdpowiedzi",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "AnkietaPytanieWartosc",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "AnkietaPytanie"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

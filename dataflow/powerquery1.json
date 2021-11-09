@@ -1,0 +1,20 @@
+{
+	"name": "powerquery1",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "Excel1",
+					"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Excel1",
+					"dataset": {
+						"referenceName": "Excel1",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"script": "section Section1;\r\nshared Excel1 = let\r\n  AdfDoc = AzureStorage.BlobContents(\"https://ducal.blob.core.windows.net/test/RaportExchangeMDRCzerwiec2021.xlsx\"),\r\n  Excel = Excel.Workbook(AdfDoc),\r\n  ExcelSheet = Excel{[Item = \"RaportExchangeMDRCzerwiec2021\", Kind = \"Sheet\"]}[Data]\r\nin\r\n  ExcelSheet;\r\nshared UserQuery = let\r\n  Source = Excel1,\r\n  #\"Removed top rows\" = Table.Skip(Source, 1),\r\n  #\"Sorted rows\" = Table.Sort(#\"Removed top rows\", {{\"Column1\", Order.Ascending}}),\r\n  #\"Uppercased text\" = Table.TransformColumns(#\"Sorted rows\", {{\"Column1\", each Text.Upper(_), type text}}),\r\n  #\"Filtered rows\" = Table.SelectRows(#\"Uppercased text\", each Text.Contains([Column1], \"BAR\")),\r\n  #\"Renamed columns\" = Table.RenameColumns(#\"Filtered rows\", {{\"Column1\", \"email\"}})\r\nin\r\n  #\"Renamed columns\";\r\n",
+			"documentLocale": "en-us"
+		}
+	}
+}
