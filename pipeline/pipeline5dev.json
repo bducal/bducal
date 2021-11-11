@@ -23,7 +23,7 @@
 				"type": "Wait",
 				"dependsOn": [
 					{
-						"activity": "Wait2",
+						"activity": "Wait2x",
 						"dependencyConditions": [
 							"Succeeded"
 						]
@@ -35,7 +35,7 @@
 				}
 			},
 			{
-				"name": "Wait2",
+				"name": "Wait2x",
 				"type": "Wait",
 				"dependsOn": [],
 				"userProperties": [],
