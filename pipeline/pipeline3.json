@@ -1,0 +1,48 @@
+{
+	"name": "pipeline3",
+	"properties": {
+		"activities": [
+			{
+				"name": "Power Query1",
+				"type": "ExecuteWranglingDataflow",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "1.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"dataflow": {
+						"referenceName": "powerquery1",
+						"type": "DataFlowReference"
+					},
+					"compute": {
+						"coreCount": 8,
+						"computeType": "General"
+					},
+					"queries": [
+						{
+							"queryName": "UserQuery",
+							"dataflowSinks": [
+								{
+									"name": "SinkJson3",
+									"dataset": {
+										"referenceName": "Json3",
+										"type": "DatasetReference"
+									},
+									"script": "sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['pq1'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\temail,\n\t\tColumn2,\n\t\tColumn3,\n\t\tColumn4,\n\t\tColumn5,\n\t\tColumn6,\n\t\tColumn7,\n\t\tColumn8,\n\t\tColumn9,\n\t\tColumn10,\n\t\tColumn11,\n\t\tColumn12,\n\t\tColumn13\n\t),\n\tpartitionBy('hash', 1)) ~> SinkJson3"
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2021-11-11T14:35:14Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
