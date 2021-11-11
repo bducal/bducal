@@ -1,0 +1,164 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "ducaldf2"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/powerquery1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "WranglingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"name": "Excel1",
+							"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tignoreNoFilesFound: false) ~> Excel1",
+							"dataset": {
+								"referenceName": "Excel1",
+								"type": "DatasetReference"
+							}
+						}
+					],
+					"script": "section Section1;\r\nshared Excel1 = let\r\n  AdfDoc = AzureStorage.BlobContents(\"https://ducal.blob.core.windows.net/test/RaportExchangeMDRCzerwiec2021.xlsx\"),\r\n  Excel = Excel.Workbook(AdfDoc),\r\n  ExcelSheet = Excel{[Item = \"RaportExchangeMDRCzerwiec2021\", Kind = \"Sheet\"]}[Data]\r\nin\r\n  ExcelSheet;\r\nshared UserQuery = let\r\n  Source = Excel1,\r\n  #\"Removed top rows\" = Table.Skip(Source, 1),\r\n  #\"Sorted rows\" = Table.Sort(#\"Removed top rows\", {{\"Column1\", Order.Ascending}}),\r\n  #\"Uppercased text\" = Table.TransformColumns(#\"Sorted rows\", {{\"Column1\", each Text.Upper(_), type text}}),\r\n  #\"Filtered rows\" = Table.SelectRows(#\"Uppercased text\", each Text.Contains([Column1], \"BAR\")),\r\n  #\"Renamed columns\" = Table.RenameColumns(#\"Filtered rows\", {{\"Column1\", \"email\"}})\r\nin\r\n  #\"Renamed columns\";\r\n",
+					"documentLocale": "en-us"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline2')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Data flow2",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow2",
+								"type": "DataFlowReference",
+								"parameters": {
+									"parameter1": {
+										"value": "'@{pipeline().parameters.par1}'",
+										"type": "Expression"
+									}
+								},
+								"datasetParameters": {
+									"source1": {},
+									"sink1": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureBlobStorage1",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "staging"
+							},
+							"integrationRuntime": {
+								"referenceName": "integrationRuntimeNETTL05",
+								"type": "IntegrationRuntimeReference"
+							},
+							"traceLevel": "Fine"
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"parameters": {
+					"par1": {
+						"type": "string",
+						"defaultValue": "nv"
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-11-11T14:35:11Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/pipeline3')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Power Query1",
+						"type": "ExecuteWranglingDataflow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "1.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "powerquery1",
+								"type": "DataFlowReference",
+								"datasetParameters": {
+									"Excel1": {},
+									"SinkJson3": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							},
+							"queries": [
+								{
+									"queryName": "UserQuery",
+									"dataflowSinks": [
+										{
+											"name": "SinkJson3",
+											"dataset": {
+												"referenceName": "Json3",
+												"type": "DatasetReference",
+												"parameters": {}
+											},
+											"script": "sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tpartitionFileNames:['pq1'],\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true,\n\tmapColumn(\n\t\temail,\n\t\tColumn2,\n\t\tColumn3,\n\t\tColumn4,\n\t\tColumn5,\n\t\tColumn6,\n\t\tColumn7,\n\t\tColumn8,\n\t\tColumn9,\n\t\tColumn10,\n\t\tColumn11,\n\t\tColumn12,\n\t\tColumn13\n\t),\n\tpartitionBy('hash', 1)) ~> SinkJson3"
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {},
+					"cancelAfter": {}
+				},
+				"annotations": [],
+				"lastPublishTime": "2021-11-11T14:35:14Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/powerquery1')]"
+			]
+		}
+	]
+}
