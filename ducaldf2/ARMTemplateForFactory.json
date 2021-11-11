@@ -456,7 +456,7 @@
 						"type": "Wait",
 						"dependsOn": [
 							{
-								"activity": "Wait1",
+								"activity": "Wait1x",
 								"dependencyConditions": [
 									"Succeeded"
 								]
